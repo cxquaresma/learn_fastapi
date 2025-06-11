@@ -1,45 +1,28 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
 
 app = FastAPI()
 
-fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+# Inside of the function, you can access all the attributes of the model object directly
+@app.post("/items/")
+async def create_item(item: Item):
+    item_dict = item.dict()
+    if item.tex is not None:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
 
-# this is a query parameter, which goes after the question mark in the URL:
-# like /items/?skip=0&limit=10
-@app.get("/items/")
-async def read_item(skip: int = 0, limit: int = 10):
-    return fake_items_db[skip : skip + limit]
-
-#making the paramater 'q' optional
-@app.get("/item/{item_id}")
-async def read_item(item_id: str, q: str | None = None):
+# You can also declare body, path and query parameters, all at the same time.
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item, q: str | None = None):
+    result = {"item_id": item_id, **item.dict()}
     if q:
-        return {"item_id": item_id, "q": q}
-    return {"item_id": item_id}
-
-# type conversion
-@app.get("/items/{item_id}")
-async def read_item(item_id: str, q: str | None = None, short: bool = False):
-    item = {"item_id": item_id}
-    if q:
-        item.update({"q": q})
-    if not short:
-        item.update({"description": "This is an amazing item that has a long description"})
-    return item
-
-# multiple path parameters
-@app.get("/users/{user_id}/items/{item_id}")
-async def read_user_item(
-        user_id: int, item_id: str, q: str | None = None, short: bool = False
-    ):
-    item = {"owner_id": user_id, "item_id": item_id}
-    if q:
-        item.update({"q": q})
-    if not short:
-        item.update({"description": "This is an amazing item that has a long description"})
-    return item
-
-# required query parameters - it will fail if 'needy' is not provided
-@app.get("/items/{item_id}")
-async def read_item_details(item_id: str, needy: str):
-    return {"item_id": item_id, "needy": needy}
+        result.update({"q": q})
+    return result
