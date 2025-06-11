@@ -5,16 +5,13 @@ from pydantic import BaseModel
 
 app = FastAPI() # creates an instance of FastAPI
 
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Union[bool, None] = None
+# Order Matters: you need to define path users/me before users/{user_id}. 
+# otherwise, FastAPI will not know which one to use when both paths match 
+# and will think /me is a user_id.
+@app.get("/users/me")
+async def read_user_me():
+    return {"user_id": "the current user"}
 
-@app.get("/") #defines a GET endpoint at the root URL (endpoint = route = path)
-def root():
-    return {"message": "Hello World"}
-
-@app.get("/items/{item_id}") # defines a GET endpoint with a path parameter
-async def read_item(item_id: int): # item_id is an integer path parameter
-    return {"item_id": item_id} # returns a JSON response with the item_id
-
+@app.get("/users/{user_id}")
+async def read_user(user_id: str):
+    return {"user_id": user_id}
