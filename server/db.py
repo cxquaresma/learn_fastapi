@@ -28,8 +28,29 @@ def create_heroes():
         session.add(hero_2)
         session.add(hero_3)
         
+        print("After adding to the session")
+        print("Hero 1:", hero_1)
+        print("Hero 2:", hero_2)
+        print("Hero 3:", hero_3)
+        
         # above holds the sql actions in memory, commit saves them to the db
         session.commit()
+    
+        print("After committing the session")
+        print("Hero 1:", hero_1)
+        print("Hero 2:", hero_2)
+        print("Hero 3:", hero_3)
+
+        print("After committing the session, show IDs")
+        print("Hero 1 ID:", hero_1.id)
+        print("Hero 2 ID:", hero_2.id)
+        print("Hero 3 ID:", hero_3.id)
+
+        print("After committing the session, show names")
+        print("Hero 1 name:", hero_1.name)
+        print("Hero 2 name:", hero_2.name)
+        print("Hero 3 name:", hero_3.name)
+
 
 
 def main():
